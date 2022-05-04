@@ -14,7 +14,6 @@ int main()
 			a[i] = new Dog();
 		else
 			a[i] = new Cat();
-
 		for (int j = 0; j < i; j++)
 		{
 			if (i % 2)
@@ -22,7 +21,6 @@ int main()
 			else
 				static_cast<Cat*>(a[i])->addIdea("I'm a cat");
 		}
-
 	}
 
 	for (int i = 0; i < 10; i++)
