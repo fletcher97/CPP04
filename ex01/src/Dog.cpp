@@ -9,7 +9,7 @@ Dog::Dog() : Animal()
 	std::cout << "[Dog]: default constructor called." << std::endl;
 }
 
-Dog::Dog(const Dog& other) : Animal()
+Dog::Dog(const Dog& other) : Animal(other)
 {
 	this->_type = other._type;
 	this->_brain = new Brain(*other._brain);
