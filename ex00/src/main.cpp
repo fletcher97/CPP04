@@ -34,8 +34,8 @@ int main()
 	const Dog* k = new Dog(*i);
 	const Cat* l = new Cat(*j);
 
-	const WrongAnimal* a = new WrongAnimal();
-	const WrongCat* b = new WrongCat();
+	WrongAnimal* a = new WrongAnimal();
+	WrongCat* b = new WrongCat();
 
 	const WrongAnimal* c = new WrongAnimal(*a);
 	const WrongCat* d = new WrongCat(*b);
@@ -59,6 +59,9 @@ int main()
 	*i = *k;
 	*j = *l;
 
+	*a = *c;
+	*b = *d;
+
 	std::cout << std::endl;
 
 	delete d;
@@ -74,6 +77,7 @@ int main()
 	delete i;
 
 	delete meta;
+	delete meta2;
 
 	return 0;
 }
