@@ -8,7 +8,7 @@ Cat::Cat() : Animal()
 	std::cout << "[Cat]: default constructor called." << std::endl;
 }
 
-Cat::Cat(const Cat& other) : Animal()
+Cat::Cat(const Cat& other) : Animal(other)
 {
 	this->_type = other._type;
 	std::cout << "[Cat]: constructor called." << std::endl;

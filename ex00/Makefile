@@ -76,6 +76,9 @@ PEDANTIC := true
 # activated/deactivated based on the language used.
 LANG := C++
 
+# Specify the compiler family to use (i.e.: gnu/clang)
+CFAMILY := gnu
+
 ################################################################################
 # Compiler & Flags
 ################################################################################
