@@ -85,9 +85,17 @@ CFAMILY := gnu
 
 # Compiler
 ifeq (${LANG},C)
-	CC := clang
-else
-	CC := clang++
+	ifeq (${CFAMILY},gnu)
+		CC := gcc
+	else ifeq (${CFAMILY},clang)
+		CC := clang
+	endif
+else ifeq (${LANG},C++)
+	ifeq (${CFAMILY},gnu)
+		CC := g++
+	else ifeq (${CFAMILY},clang)
+		CC := clang++
+	endif
 endif
 
 # Compiler flags
@@ -102,15 +110,15 @@ ifeq (${PEDANTIC},true)
 	CFLAGS += -Wcast-qual -Wdisabled-optimization -Wformat=2 -Wuninitialized
 	CFLAGS += -Winit-self -Wmissing-include-dirs -Wredundant-decls -Wshadow
 	CFLAGS += -Wstrict-overflow=5 -Wundef -fdiagnostics-show-option
-	CFLAGS += -fstack-protector-all -fstack-clash-protection
-	ifeq (${CC},gcc)
+	CFLAGS += -fstack-protector-all
+	ifeq (${CFAMILY},gnu)
 		CFLAGS += -Wformat-signedness -Wformat-truncation=2 -Wformat-overflow=2
-		CFLAGS += -Wlogical-op -Wstringop-overflow=4
+		CFLAGS += -Wlogical-op -Wstringop-overflow=4  -fstack-clash-protection
 	endif
 	ifeq (${LANG},C++)
 		CFLAGS += -Wctor-dtor-privacy -Wold-style-cast -Woverloaded-virtual
 		CFLAGS += -Wsign-promo
-		ifeq (${CC},gcc)
+		ifeq (${CFAMILY},gnu)
 			CFLAGS += -Wstrict-null-sentinel -Wnoexcept
 		endif
 	endif
@@ -118,6 +126,9 @@ endif
 
 # Generic debug flags
 DFLAGS := -g
+
+# Coverage flags
+COVFLAGS = -fprofile-arcs -ftest-coverage
 
 # Address sanitizing flags
 ASAN := -fsanitize=address -fsanitize-recover=address
@@ -142,6 +153,7 @@ INC_ROOT := inc/
 LIB_ROOT := lib/
 OBJ_ROOT := obj/
 SRC_ROOT := src/
+COV_ROOT := cov/
 
 ################################################################################
 # Libraries
@@ -284,11 +296,15 @@ clean: $$(call get_lib_target,$${DEFAULT_LIBS},$$@)
 	${AT}printf "\033[38;5;1m[REMOVING OBJECTS]\033[0m\n" ${BLOCK}
 	${AT}mkdir -p ${OBJ_ROOT} ${BLOCK}
 	${AT}find ${OBJ_ROOT} -type f -name "*.o" -delete ${BLOCK}
+	${AT}find ${OBJ_ROOT} -type f -name "*.gcda" -delete ${BLOCK}
+	${AT}find ${OBJ_ROOT} -type f -name "*.gcno" -delete ${BLOCK}
 
 fclean: $$(call get_lib_target,$${DEFAULT_LIBS},$$@)
 	${AT}printf "\033[38;5;1m[REMOVING OBJECTS]\033[0m\n" ${BLOCK}
 	${AT}mkdir -p ${OBJ_ROOT} ${BLOCK}
 	${AT}find ${OBJ_ROOT} -type f -name "*.o" -delete ${BLOCK}
+	${AT}find ${OBJ_ROOT} -type f -name "*.gcda" -delete ${BLOCK}
+	${AT}find ${OBJ_ROOT} -type f -name "*.gcno" -delete ${BLOCK}
 	${AT}printf "\033[38;5;1m[REMOVING BINARIES]\033[0m\n" ${BLOCK}
 	${AT}mkdir -p ${BIN_ROOT} ${BLOCK}
 	${AT}find ${BIN_ROOT} -type f\
@@ -310,6 +326,14 @@ re: fclean all
 debug: CFLAGS += ${DFLAGS}
 debug: $$(call get_lib_target,$${DEFAULT_LIBS},$$@) all
 
+debug_cov: CFLAGS += ${COVFLAGS}
+debug_cov: $$(call get_lib_target,$${DEFAULT_LIBS},$$@) all
+
+cov: debug_cov
+	${AT}mkdir -p gcov ${BLOCK}
+	${AT}gcov -arHs src obj/*.gc* ${BLOCK}
+	${AT}mv *.gcov gcov ${BLOCK}
+
 obj/asan/asan.o: src/asan/asan.c
 	${AT}mkdir -p ${@D} ${BLOCK}
 	${AT}${CC} -o $@ -c $< ${BLOCK}
@@ -325,6 +349,8 @@ debug_msan: CFLAGS += ${DFLAGS} ${MSAN}
 debug_msan: $$(call get_lib_target,$${DEFAULT_LIBS},$$@) all
 
 debug_re: fclean debug
+
+debug_cov_re: fclean debug_cov
 
 debug_asan_re: fclean debug_asan
 
@@ -343,9 +369,11 @@ debug_msan_re: fclean debug_msan
 	${AT}mkdir -p ${INC_ROOT} ${BLOCK}
 	${AT}mkdir -p ${OBJ_ROOT} ${BLOCK}
 	${AT}mkdir -p ${SRC_ROOT} ${BLOCK}
+	${AT}mkdir -p ${COV_ROOT} ${BLOCK}
 	${AT}printf "\033[33m[INITIALIZING GIT REPOSITORY]\033[0m\n" ${BLOCK}
 	${AT}git init ${BLOCK}
-	${AT}echo "*.o\n*.d\n.vscode\na.out\n.DS_Store\nbin/\n*.ignore"\
+	${AT}echo -en ".DS_Store\na.out\n*.o\n"\
+		"*.gcda\n*.gcno\n*.gcov\n*.d\n*.ignore\n.vscode/\nbin/"\
 		> .gitignore ${BLOCK}
 	${AT}date > $@ ${BLOCK}
 	${AT}printf "\033[33m[CREATING FIRST COMMIT]\033[0m\n" ${BLOCK}
@@ -379,6 +407,9 @@ compile-test: ${addprefix compile-test/,${NAMES}}
 
 # Phony debug targets
 .PHONY: debug debug_re debug_asan debug_asan_re debug_tsan debug_tsan_re
+
+# Phony cov targets
+.PHONY: debug_cov debug_cov_re gcov
 
 # Phony utility targets
 .PHONY: targets .FORCE compile-test
