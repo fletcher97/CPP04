@@ -20,6 +20,7 @@ Dog&
 Dog::operator=(const Dog& other)
 {
 	this->_type = other._type;
+	delete this->_brain;
 	this->_brain = new Brain(*other._brain);
 	std::cout << "[Dog]: copy assignment called." << std::endl;
 	return *this;
