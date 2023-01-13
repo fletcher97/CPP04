@@ -9,14 +9,13 @@ WrongAnimal::WrongAnimal() : _type("Unknown")
 
 WrongAnimal::WrongAnimal(const WrongAnimal& other) : _type(other._type)
 {
-	std::cout << "[WrongAnimal]: copy constructor called." << std::endl;
+	std::cout << "[WrongAnimal]: constructor called." << std::endl;
 }
 
 WrongAnimal&
 WrongAnimal::operator=(const WrongAnimal& other)
 {
 	this->_type = other._type;
-	std::cout << "[WrongAnimal]: copy assignment called." << std::endl;
 	return *this;
 }
 
