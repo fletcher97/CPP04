@@ -30,6 +30,7 @@ Character::Character(std::string& name) : _name(name)
 
 Character::Character(const Character& other) : _name(other.getName())
 {
+	this->bin.clean();
 	for (int i = 0; i < 4; i++)
 	{
 		if (other._inv[i] != NULL)
@@ -42,6 +43,7 @@ Character::Character(const Character& other) : _name(other.getName())
 Character&
 Character::operator=(const Character& other)
 {
+	this->bin.clean();
 	this->_name = other._name;
 	for (int i = 0; i < 4; i++)
 	{
@@ -72,7 +74,8 @@ Character::getName() const
 	return this->_name;
 }
 
-void Character::equip(AMateria* m)
+void
+Character::equip(AMateria* m)
 {
 	int i;
 	for (i = 0; i < 4 && this->_inv[i] != NULL; i++);
@@ -80,7 +83,8 @@ void Character::equip(AMateria* m)
 		this->_inv[i] = m;
 }
 
-void Character::unequip(int idx)
+void
+Character::unequip(int idx)
 {
 	if (idx < 0 || idx > 3 || this->_inv[idx] == NULL)
 		return;
@@ -88,7 +92,8 @@ void Character::unequip(int idx)
 	this->_inv[idx] = NULL;
 }
 
-void Character::use(int idx, ICharacter& target)
+void
+Character::use(int idx, ICharacter& target)
 {
 	if (idx < 0 || idx > 3 || this->_inv[idx] == NULL)
 		return;
