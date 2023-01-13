@@ -32,6 +32,7 @@ public:
 	~Trash();
 
 	void add(AMateria *elem);
+	void clean();
 };
 
 #endif // TRASH_HPP

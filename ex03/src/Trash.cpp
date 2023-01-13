@@ -27,7 +27,8 @@ Trash::Node::~Node()
 	delete this->_content;
 }
 
-bool Trash::Node::hasNext() const
+bool
+Trash::Node::hasNext() const
 {
 	return this->_next != NULL;
 }
@@ -37,7 +38,8 @@ Trash::Node* Trash::Node::next() const
 	return this->_next;
 }
 
-void Trash::Node::addNext(Trash::Node* next)
+void
+Trash::Node::addNext(Trash::Node* next)
 {
 	this->_next = next;
 }
@@ -59,7 +61,8 @@ Trash::~Trash()
 	delete this->_head;
 }
 
-void Trash::add(AMateria *elem)
+void
+Trash::add(AMateria *elem)
 {
 	if (!this->_head)
 	{
@@ -72,4 +75,11 @@ void Trash::add(AMateria *elem)
 		n = n->next();
 	}
 	n->addNext(new Trash::Node(elem));
+}
+
+void
+Trash::clean()
+{
+	delete this->_head;
+	this->_head = NULL;
 }
