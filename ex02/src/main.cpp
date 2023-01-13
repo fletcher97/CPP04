@@ -1,7 +1,6 @@
 #include <iostream>
 
 #include "Cat.hpp"
-#include "WrongCat.hpp"
 #include "Dog.hpp"
 
 int main()
