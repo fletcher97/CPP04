@@ -77,7 +77,7 @@ PEDANTIC := true
 LANG := C++
 
 # Specify the compiler family to use (i.e.: gnu/clang)
-CFAMILY := gnu
+CFAMILY := clang
 
 ################################################################################
 # Compiler & Flags
